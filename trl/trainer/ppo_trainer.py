@@ -380,6 +380,7 @@ class PPOTrainer(BaseTrainer):
         length_sampler: Callable = None,
         batch_size: int = 4,
         return_prompt: bool = True,
+        unsqueeze: bool = True,
         **generation_kwargs,
     ):
         """
@@ -415,7 +416,7 @@ class PPOTrainer(BaseTrainer):
             if length_sampler is not None:
                 generation_kwargs["max_new_tokens"] = length_sampler()
             response = self.accelerator.unwrap_model(self.model).generate(
-                input_ids=query_tensor.unsqueeze(dim=0), **generation_kwargs
+                input_ids=query_tensor.unsqueeze(dim=0) if unsqueeze else query_tensor, **generation_kwargs
             )
 
             if not return_prompt and not self.is_encoder_decoder:
